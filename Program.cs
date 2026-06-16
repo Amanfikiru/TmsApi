@@ -24,8 +24,12 @@ builder.Host.UseDefaultServiceProvider(options =>
     options.ValidateOnBuild = true;
 });
 
+// --- 3. Configuration & Options Validation ---
+builder.Services.AddOptions<PaymentOptions>()
+    .BindConfiguration(PaymentOptions.SectionName)
+    .ValidateDataAnnotations() 
+    .ValidateOnStart();
 
-// 🛑 THE SYSTEM LOCK: Everything above this line is configuration, everything below is execution
 var app = builder.Build(); 
 
 
