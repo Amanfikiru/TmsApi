@@ -56,6 +56,24 @@ app.MapGet("/api/enrollments/worker-smoke", (EnrollmentWorker worker) =>
     return Results.Ok("processed");
 });
 
+app.MapGet("/api/enrollments/test-logs", async (IEnrollmentService enrollmentService) =>
+{
+    // Trigger successful creation
+    var enrollment = await enrollmentService.EnrollAsync("S-001", "CS-101");
+    
+    // Trigger the warning path by attempting exact same mutation again
+    await enrollmentService.EnrollAsync("S-001", "CS-101");
+    
+    // Trigger missing resource warning lookup
+    await enrollmentService.GetByIdAsync("nonexistent-id");
+    
+    // Trigger deletion metrics
+    await enrollmentService.DeleteAsync(enrollment.Id);
+    await enrollmentService.DeleteAsync("nonexistent-id");
+
+    return Results.Ok("Log audit sequence executed.");
+});
+
 app.MapGet("/error", () => Results.Problem("An unexpected error occurred."));
 
 app.Run();
